@@ -1,14 +1,16 @@
-import { EnvHttpProxyAgent, setGlobalDispatcher } from 'undici';
-
 // Node's built-in fetch does not honor HTTP_PROXY/HTTPS_PROXY env vars on
 // its own -- it needs an explicit proxy-aware dispatcher. Some environments
 // this CLI runs in (e.g. a sandboxed dev VM) route all outbound HTTPS
 // through such a proxy, so wire one in whenever those env vars are set,
 // rather than silently failing DNS lookups for every GitHub API call.
+// `undici` is imported lazily (only when a GitHub-ref target is actually
+// being validated, and only when a proxy env var is present) so that
+// unrelated commands -- --help, --version, local-path config validation --
+// never pay its load cost or depend on it at all.
 // Guarded by a module-level flag so repeated calls don't keep replacing
 // the global dispatcher.
 let proxyDispatcherConfigured = false;
-function ensureProxyAwareFetch() {
+async function ensureProxyAwareFetch() {
   if (proxyDispatcherConfigured) return;
   proxyDispatcherConfigured = true;
   const hasProxyEnv = Boolean(
@@ -18,6 +20,7 @@ function ensureProxyAwareFetch() {
       process.env.http_proxy
   );
   if (hasProxyEnv) {
+    const { EnvHttpProxyAgent, setGlobalDispatcher } = await import('undici');
     setGlobalDispatcher(new EnvHttpProxyAgent());
   }
 }
@@ -46,7 +49,7 @@ export class GithubResolutionError extends Error {
  * lookup.
  */
 export async function resolveGithubRepo(ownerRepo, { token = process.env.GH_TOKEN, fetchImpl = fetch } = {}) {
-  ensureProxyAwareFetch();
+  await ensureProxyAwareFetch();
   const [owner, repo] = ownerRepo.split('/');
 
   const headers = {
