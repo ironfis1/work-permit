@@ -1,0 +1,41 @@
+{
+  "name": "work-permit",
+  "version": "0.1.0",
+  "description": "Turns a goal or vision statement into RAG-grounded, spec'd, test-planned, security-reviewed units of work sized for a day's human review - ready for Claude Code to build against.",
+  "main": "src/cli.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ironfis1/work-permit.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ironfis1/work-permit/issues"
+  },
+  "homepage": "https://github.com/ironfis1/work-permit#readme",
+  "dependencies": {
+    "commander": "^15.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.9.1",
+    "eslint-plugin-security": "^4.0.1",
+    "vitest": "^4.1.11"
+  },
+  "type": "module",
+  "bin": {
+    "work-permit": "./src/cli.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
