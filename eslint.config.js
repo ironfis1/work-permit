@@ -12,6 +12,7 @@ export default [
         process: 'readonly',
         console: 'readonly',
         __dirname: 'readonly',
+        fetch: 'readonly',
       },
     },
     rules: {
