@@ -13,6 +13,8 @@ export default [
         console: 'readonly',
         __dirname: 'readonly',
         fetch: 'readonly',
+        Buffer: 'readonly',
+        TextDecoder: 'readonly',
       },
     },
     rules: {

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { Command } from 'commander';
 import { registerConfigCommand } from './config/cli.js';
+import { registerIntakeCommand } from './intake/cli.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -19,11 +20,11 @@ program
   .exitOverride();
 
 registerConfigCommand(program);
+registerIntakeCommand(program);
 
-// Further subcommands are added by later stories:
-//   intake   -> Story 1.3 (goal/vision intake command)
-// Registering them here as they land keeps this file the single CLI
-// entrypoint without restructuring.
+// Further subcommands are added by later epics, registered here as they
+// land -- this keeps the file the single CLI entrypoint without
+// restructuring.
 
 try {
   await program.parseAsync(process.argv);

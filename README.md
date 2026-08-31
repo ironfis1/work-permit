@@ -30,7 +30,7 @@ CI (`.github/workflows/ci.yml`) runs lint and tests on every push and pull reque
 src/
   cli.js         CLI entrypoint (Commander)
   config/        Story 1.2 - target-repo config + read-access validation
-  intake/        Story 1.3 - goal/vision intake
+  intake/        Story 1.3 - goal/vision intake (done)
   decompose/     Epic 2 - decomposition engine
   rag/           Epic 3 - RAG corpus & retrieval
   spec/          Epic 4 - spec generation
@@ -71,3 +71,19 @@ npx work-permit config validate --config path/to/other-config.json
 `config validate` confirms the target resolves and is readable - for a local path, that it exists and is a git repo; for a GitHub reference, that the API returns it and a default branch. Errors name the specific problem (missing field, path not found vs. not a git repo, repo not found vs. no GitHub access vs. not authenticated) rather than a generic failure.
 
 Node's built-in `fetch` doesn't read `HTTP_PROXY`/`HTTPS_PROXY` on its own; `config validate` wires in a proxy-aware dispatcher automatically when those env vars are set, so it also works unmodified in a proxied sandbox/CI environment.
+
+## Intake
+
+`work-permit intake` captures a raw goal/vision statement as a versioned, timestamped artifact for Epic 2's decomposition engine to consume later. This story does no interpretation of the text -- it's purely "get the human's intent into the system reliably and re-visibly."
+
+```bash
+npx work-permit intake --text "Add a login flow with email/password and Google SSO"
+npx work-permit intake --file goal.md
+cat goal.md | npx work-permit intake
+npx work-permit intake list
+```
+
+- Exactly one input source is required: `--text`, `--file`, or piped stdin. Specifying `--text` and `--file` together, or specifying neither with nothing piped in, is a validation error naming the conflict.
+- Each intake is stored at `.work-permit/intake/<ISO-timestamp>-<slug>.json`, alongside its `targetRepo` (from the loaded config), `source` (`text`/`file`/`stdin`), and a stable `intakeId`.
+- `intake list` shows prior intakes for the current config's `targetRepo` only, most recent first -- lets you confirm what got captured before pointing later stages at it.
+- Empty/whitespace-only input and input over 100KB are both rejected with specific, distinct error messages rather than a silent or partial write.
